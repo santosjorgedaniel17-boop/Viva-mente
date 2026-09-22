@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VIVA MENTE - Gestão Cognitiva</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-[#f8fafc] min-h-screen text-slate-900">
+
+    <nav
+        id="main-nav"
+        class="bg-white/80 glass border-b border-slate-100 sticky top-0 z-40"
+    >
+        <div class="max-w-7xl mx-auto px-6">
+
+            <div class="flex justify-between h-20 items-center">
+
+                <div class="flex items-center">
+
+                    <div class="bg-indigo-600 p-2 rounded-xl mr-3">
+                        <i class="fas fa-brain text-white text-lg"></i>
+                    </div>
+
+                    <span class="font-black text-2xl text-slate-800 tracking-tighter">
+                        VIVA MENTE
+                    </span>
+
+                    <span
+                        id="badge-perfil"
+                        class="ml-4 px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-full"
+                    >
+                    </span>
+
+                </div>
+
+                <div class="flex items-center space-x-4">
+
+                    <div class="flex items-center bg-slate-100 rounded-2xl px-4 py-2">
+
+                        <i class="fas fa-user-circle text-slate-400 mr-2"></i>
+
+                        <select
+                            id="select-global-paciente"
+                            onchange="app.switchPaciente(this.value)"
+                            class="bg-transparent text-sm font-bold text-slate-700 border-none outline-none cursor-pointer"
+                        >
+                        </select>
+
+                    </div>
+
+                    <button
+                        onclick="app.logout()"
+                        class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                    >
+                        <i class="fas fa-power-off"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </nav>
+
+
+    <main class="max-w-7xl mx-auto p-6 lg:p-10">
+
+        <!-- PAINEL DO MÉDICO -->
+
+        <div
+            id="area-medico"
+            class="hidden-el space-y-8 animate-pop"
+        >
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+                <div>
+
+                    <h2 class="text-3xl font-black text-slate-800">
+                        Painel Clínico
+                    </h2>
+
+                    <p class="text-slate-500 font-medium">
+                        Gerencie pacientes e acompanhe tratamentos.
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="app.openModal('modal-novo-paciente')"
+                    class="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                >
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Novo Paciente
+                </button>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <div
+                    id="medico-stats"
+                    class="space-y-4"
+                >
+                </div>
+
+                
+
+            </div>
+
+
+            <div class="bg-white rounded-[2.5rem] card-shadow border border-slate-100 overflow-hidden">
+
+                <div class="flex border-b border-slate-100 bg-slate-50/50 overflow-x-auto no-scrollbar">
+
+                    <button
+                        id="tab-prescricoes"
+                        onclick="app.switchTab('prescricoes')"
+                        class="px-8 py-6 text-[10px] font-black uppercase tracking-widest tab-active"
+                    >
+                        Medicamentos
+                    </button>
+
+                    <button
+                        id="tab-rotina"
+                        onclick="app.switchTab('rotina')"
+                        class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600"
+                    >
+                        Plano de Rotina
+                    </button>
+
+                    <button
+                        id="tab-exames-med"
+                        onclick="app.switchTab('exames-med')"
+                        class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600"
+                    >
+                        Resultados Exames
+                    </button>
+
+                    <button
+                        id="tab-equipe"
+                        onclick="app.switchTab('equipe')"
+                        class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600"
+                    >
+                        Equipe de Apoio
+                    </button>
+
+                </div>
+
+
+                <div class="p-8">
+
+                    <!-- MEDICAMENTOS -->
+
+                    <div
+                        id="view-prescricoes"
+                        class="tab-view"
+                    >
+
+                        <div class="flex justify-between items-center mb-6">
+
+                            <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">
+                                Prescrições Ativas
+                            </h4>
+
+                            <button
+                                onclick="app.openModal('modal-prescricao')"
+                                class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100"
+                            >
+                                <i class="fas fa-plus mr-1"></i>
+                                Nova Prescrição
+                            </button>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-left">
+
+                                <thead>
+
+                                    <tr class="border-b border-slate-100">
+
+                                        <th class="pb-4 text-[9px] uppercase tracking-widest text-slate-400 font-black">
+                                            Medicamento
+                                        </th>
+
+                                        <th class="pb-4 text-[9px] uppercase tracking-widest text-slate-400 font-black">
+                                            Dosagem
+                                        </th>
+
+                                        <th class="pb-4 text-[9px] uppercase tracking-widest text-slate-400 font-black">
+                                            Horário
+                                        </th>
+
+                                        <th class="pb-4"></th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="medico-prescricoes-body">
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ROTINA -->
+
+                    <div
+                        id="view-rotina"
+                        class="tab-view hidden-el"
+                    >
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                            <div>
+
+                                <h4 class="font-black text-slate-800 mb-6 uppercase text-xs tracking-widest">
+                                    Atividades Programadas
+                                </h4>
+
+                                <div
+                                    id="medico-rotina-lista"
+                                    class="space-y-3"
+                                >
+                                </div>
+
+                            </div>
+
+
+                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+
+                                <h4 class="font-black text-slate-800 mb-4 uppercase text-xs tracking-widest">
+                                    Nova Atividade
+                                </h4>
+                            
+                                <form
+                                    onsubmit="app.addTask(event)"
+                                    class="space-y-4"
+                                >
+                            
+                                    <input
+                                        type="text"
+                                        id="task-name"
+                                        required
+                                        placeholder="Ex: Exercício de Linguagem"
+                                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-sm"
+                                    >
+                            
+                                    <textarea
+                                        id="task-message"
+                                        required
+                                        placeholder="Ex: Realizar atividade de memória 1 vez por semana"
+                                        rows="4"
+                                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-sm resize-none"
+                                    ></textarea>
+                            
+                                    <button
+                                        type="submit"
+                                        class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest"
+                                    >
+                                        Salvar
+                                    </button>
+                            
+                                </form>
+                            
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EXAMES -->
+
+                    <div
+                        id="view-exames-med"
+                        class="tab-view hidden-el"
+                    >
+
+                        <h4 class="font-black text-slate-800 mb-6 uppercase text-xs tracking-widest">
+                            Exames Anexados
+                        </h4>
+
+                        <div
+                            id="medico-exames-lista"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        >
+                        </div>
+
+                    </div>
+
+
+                    <!-- EQUIPE -->
+
+                    <div
+                        id="view-equipe"
+                        class="tab-view hidden-el"
+                    >
+
+                        <div class="flex justify-between items-center mb-6">
+
+                            <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">
+                                Membros da Equipe
+                            </h4>
+
+                            <button
+                                onclick="app.openModal('modal-equipe')"
+                                class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100"
+                            >
+                                <i class="fas fa-plus mr-1"></i>
+                                Adicionar Profissional
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="medico-equipe-lista"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        >
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAINEL DO CUIDADOR -->
+     
+         
+        <div
+            id="area-cuidador"
+            class="hidden-el space-y-8 animate-pop"
+        >
+        <div class="bg-white p-6 rounded-[2.5rem] card-shadow border border-slate-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        Data do acompanhamento
+                    </p>
+        
+                    <h3 class="font-black text-xl text-slate-800">
+                        Selecione o dia
+                    </h3>
+                </div>
+        
+                <input
+                    type="date"
+                    id="data-acompanhamento"
+                    onchange="app.selecionarData(this.value)"
+                    class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 font-bold text-sm"
+                >
+        
+            </div>
+        </div>
+
+            <div
+                id="banner-cuidador"
+                class="bg-gradient-to-br from-indigo-600 to-violet-800 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden"
+            >
+
+                <div class="relative z-10">
+
+                    <span class="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">
+                        Monitoramento Diário
+                    </span>
+
+                    <h2
+                        class="text-4xl font-black mb-2"
+                        id="cuidador-paciente-nome"
+                    >
+                        Paciente
+                    </h2>
+
+                    <p
+                        id="cuidador-paciente-info"
+                        class="text-indigo-100 font-medium opacity-90"
+                    >
+                    </p>
+
+                </div>
+
+                <i class="fas fa-heartbeat absolute right-[-20px] bottom-[-20px] text-white/10 text-[200px]"></i>
+
+            </div>
+
+
+            <!-- HUMOR -->
+
+            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+
+                <div class="flex items-center justify-between mb-6">
+
+                    <h3 class="font-black text-xl text-slate-800">
+                        Como está o paciente agora?
+                    </h3>
+
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        Feedback Rápido
+                    </span>
+
+                </div>
+
+
+                <div class="flex flex-wrap justify-between gap-4 p-4 bg-slate-50 rounded-3xl">
+
+                    <button
+                        onclick="app.selectMood('happy', '😊', 'Estável / Feliz')"
+                        class="emoji-btn p-4 rounded-2xl text-3xl"
+                        id="mood-happy"
+                        title="Estável / Feliz"
+                    >
+                        😊
+                    </button>
+
+                    <button
+                        onclick="app.selectMood('confused', '😕', 'Desorientado')"
+                        class="emoji-btn p-4 rounded-2xl text-3xl"
+                        id="mood-confused"
+                        title="Desorientado"
+                    >
+                        😕
+                    </button>
+
+                    <button
+                        onclick="app.selectMood('agitated', '😠', 'Agitado')"
+                        class="emoji-btn p-4 rounded-2xl text-3xl"
+                        id="mood-agitated"
+                        title="Agitado"
+                    >
+                        😠
+                    </button>
+
+                    <button
+                        onclick="app.selectMood('sleepy', '😴', 'Sonolento')"
+                        class="emoji-btn p-4 rounded-2xl text-3xl"
+                        id="mood-sleepy"
+                        title="Sonolento"
+                    >
+                        😴
+                    </button>
+
+                    <button
+                        onclick="app.selectMood('sad', '😢', 'Triste / Apático')"
+                        class="emoji-btn p-4 rounded-2xl text-3xl"
+                        id="mood-sad"
+                        title="Triste / Apático"
+                    >
+                        😢
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="mood-status"
+                    class="mt-4 text-center hidden-el"
+                >
+
+                    <p class="text-sm font-bold text-slate-600">
+
+                        Registrado:
+
+                        <span
+                            id="mood-label"
+                            class="text-indigo-600"
+                        >
+                        </span>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- TAREFAS -->
+
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+
+                        <div class="flex items-center justify-between mb-8">
+
+                            <h3 class="font-black text-2xl text-slate-800">
+                                Tarefas de Hoje
+                            </h3>
+
+                            <div
+                                id="progresso-diario"
+                                class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full tracking-widest uppercase"
+                            >
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="cuidador-checklist"
+                            class="space-y-3"
+                        >
+                        </div>
+
+                    </div>
+
+
+                    <!-- EXAMES -->
+
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+
+                        <h3 class="font-black text-2xl text-slate-800 mb-6">
+                            Anexar Resultados
+                        </h3>
+
+                        <form
+    onsubmit="app.addExame(event)"
+    class="flex flex-col gap-4"
+>
+    <div class="flex flex-col md:flex-row gap-4">
+
+        <input
+            type="text"
+            id="exame-nome"
+            required
+            placeholder="Exame"
+            class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+
+        <input
+            type="date"
+            id="exame-data"
+            required
+            class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+
+    </div>
+
+    <textarea
+        id="exame-resultados"
+        required
+        rows="5"
+        placeholder="Resultados do exame"
+        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm resize-none"
+    ></textarea>
+
+    <div class="flex flex-col md:flex-row gap-4">
+
+        <input
+            type="file"
+            id="exame-arquivo"
+            accept=".pdf,.jpg,.jpeg,.png"
+            class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 font-bold text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 cursor-pointer"
+        >
+
+        <button
+            type="submit"
+            class="w-full md:w-auto bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 shrink-0"
+        >
+            Salvar Exame
+        </button>
+
+    </div>
+</form>
+
+                        <div
+                            id="cuidador-exames-lista"
+                            class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3"
+                        >
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COLUNA LATERAL -->
+
+                <div class="space-y-6">
+
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+
+                        <h3 class="font-black text-slate-800 mb-6 uppercase text-xs tracking-widest">
+                            Equipe
+                        </h3>
+
+                        <div
+                            id="cuidador-equipe-lista"
+                            class="space-y-3"
+                        >
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        onclick="app.openModal('modal-reacao')"
+                        class="w-full bg-red-500 text-white p-8 rounded-[2.5rem] shadow-xl shadow-red-100 hover:bg-red-600 transition-all text-left"
+                    >
+
+                        <i class="fas fa-phone-alt text-3xl mb-3"></i>
+
+                        <span class="font-black uppercase tracking-widest text-xs block">
+                            Relatar Incidente
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- MODAIS -->
+
+    <div
+        id="modal-container"
+        class="hidden-el fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+    >
+    <!-- EDITAR HORÁRIO DA TAREFA -->
+
+<div
+id="modal-editar-tarefa"
+class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+>
+
+<h3 class="text-2xl font-black text-slate-800 mb-2">
+    Editar horário
+</h3>
+
+<p class="text-sm text-slate-400 font-medium mb-6">
+    Altere o horário da tarefa selecionada.
+</p>
+
+<form
+    onsubmit="app.salvarEdicaoTarefa(event)"
+    class="space-y-5"
+>
+
+    <div>
+
+        <label class="
+            text-[10px]
+            font-black
+            uppercase
+            text-slate-400
+            ml-2
+        ">
+            Horário da tarefa
+        </label>
+
+        <input
+            type="time"
+            id="editar-tarefa-hora"
+            required
+            class="
+                w-full
+                bg-slate-50
+                border
+                border-slate-200
+                rounded-2xl
+                px-5
+                py-4
+                font-bold
+                text-sm
+                outline-none
+                focus:ring-2
+                focus:ring-indigo-500
+            "
+        >
+
+    </div>
+
+    <button
+        type="submit"
+        class="
+            w-full
+            bg-indigo-600
+            text-white
+            py-4
+            rounded-2xl
+            font-black
+            text-xs
+            uppercase
+            tracking-widest
+        "
+    >
+        Salvar alteração
+    </button>
+
+    <button
+        type="button"
+        onclick="app.closeModal()"
+        class="
+            w-full
+            py-3
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+        "
+    >
+        Cancelar
+    </button>
+
+</form>
+
+</div>
+    <!-- MODAL EDITAR MEDICAMENTO -->
+<div
+id="modal-editar-medicamento"
+class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+>
+<h3 class="text-2xl font-black text-slate-800 mb-2">
+    Editar Medicamento
+</h3>
+
+<p class="text-sm text-slate-400 mb-6">
+    Altere o horário da medicação.
+</p>
+
+<form
+    onsubmit="app.salvarEdicaoMedicamento(event)"
+    class="space-y-4"
+>
+    <input
+        type="text"
+        id="editar-med-nome"
+        disabled
+        class="w-full bg-slate-100 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm text-slate-500"
+    >
+
+    <input
+        type="text"
+        id="editar-med-dose"
+        disabled
+        class="w-full bg-slate-100 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm text-slate-500"
+    >
+
+    <div>
+        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+            Novo horário
+        </label>
+
+        <input
+            type="time"
+            id="editar-med-hora"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+    </div>
+
+    <div class="flex gap-3 pt-2">
+
+        <button
+            type="button"
+            onclick="app.closeModal()"
+            class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+        >
+            Cancelar
+        </button>
+
+        <button
+            type="submit"
+            class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+        >
+            Salvar
+        </button>
+
+    </div>
+</form>
+</div>
+
+
+<!-- MODAL EDITAR TAREFA -->
+<div
+id="modal-editar-tarefa"
+class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+>
+<h3 class="text-2xl font-black text-slate-800 mb-2">
+    Editar Horário
+</h3>
+
+<p
+    id="editar-tarefa-nome"
+    class="text-sm text-slate-400 mb-6"
+></p>
+
+<form
+    onsubmit="app.salvarEdicaoTarefa(event)"
+    class="space-y-4"
+>
+    <div>
+        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+            Novo horário
+        </label>
+
+        <input
+            type="time"
+            id="editar-tarefa-hora"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+    </div>
+
+    <div class="flex gap-3 pt-2">
+
+        <button
+            type="button"
+            onclick="app.closeModal()"
+            class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+        >
+            Cancelar
+        </button>
+
+        <button
+            type="submit"
+            class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+        >
+            Salvar
+        </button>
+
+    </div>
+</form>
+</div>
+
+        <!-- NOVO PACIENTE -->
+
+        <div
+            id="modal-novo-paciente"
+            class="hidden-el bg-white rounded-[2.5rem] w-full max-w-lg p-10 animate-pop"
+        >
+
+            <h3 class="text-3xl font-black mb-2 text-slate-800">
+                Novo Paciente
+            </h3>
+
+            <p class="text-slate-400 text-sm mb-8 font-medium">
+                Inicie o registro do novo prontuário.
+            </p>
+
+
+            <form
+                onsubmit="app.addPaciente(event)"
+                class="space-y-5"
+            >
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="col-span-2">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Nome do Paciente
+                    </label>
+            
+                    <input
+                        type="text"
+                        name="nome"
+                        required
+                        placeholder="Nome Completo"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                </div>
+            
+            
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Data de Nascimento
+                    </label>
+            
+                    <input
+                        type="date"
+                        name="dataNascimento"
+                        required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm"
+                    >
+                </div>
+            
+            
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Gravidade
+                    </label>
+            
+                    <select
+                        name="estagio"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm"
+                    >
+                        <option>Leve</option>
+                        <option>Moderada</option>
+                        <option>Avançada</option>
+                    </select>
+                </div>
+            
+            
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Diagnóstico
+                    </label>
+            
+                    <input
+                        type="text"
+                        name="diagnostico"
+                        required
+                        placeholder="Ex: Alzheimer"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm"
+                    >
+                </div>
+            
+            
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Data do Diagnóstico
+                    </label>
+            
+                    <input
+                        type="date"
+                        name="dataDiagnostico"
+                        required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm"
+                    >
+                </div>
+            
+            
+                <div class="col-span-2">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Telefone de Contato (Cuidador/Família)
+                    </label>
+            
+                    <input
+                        type="tel"
+                        name="telefone"
+                        required
+                        placeholder="(00) 00000-0000"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500"
+                    >
+                </div>
+            
+            </div>
+
+
+                <div class="flex gap-3 pt-4">
+
+                    <button
+                        type="button"
+                        onclick="app.closeModal()"
+                        class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="flex-2 bg-indigo-600 text-white py-4 px-8 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg"
+                    >
+                        Cadastrar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- PRESCRIÇÃO -->
+
+        <div
+            id="modal-prescricao"
+            class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+        >
+
+            <h3 class="text-2xl font-black mb-6">
+                Prescrever
+            </h3>
+
+           <form
+    onsubmit="app.addPrescricao(event)"
+    class="space-y-4"
+>
+
+    <input
+        type="text"
+        name="med"
+        required
+        placeholder="Medicamento"
+        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+    >
+
+    <div class="grid grid-cols-2 gap-4">
+
+        <input
+            type="text"
+            name="dose"
+            required
+            placeholder="Ex: 1 comprimido, 20 gotas"
+            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+
+        <select
+            name="hora"
+            required
+            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+        >
+            <option value="">Intervalo</option>
+            <option value="A cada 4 horas">A cada 4 horas</option>
+            <option value="A cada 8 horas">A cada 8 horas</option>
+            <option value="A cada 12 horas">A cada 12 horas</option>
+            <option value="A cada 24 horas">A cada 24 horas</option>
+        </select>
+
+    </div>
+
+    <button
+        type="submit"
+        class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+    >
+        Confirmar
+    </button>
+
+</form>
+        </div>
+
+
+        <!-- EQUIPE -->
+
+        <div
+            id="modal-equipe"
+            class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+        >
+
+            <h3 class="text-2xl font-black mb-6">
+                Adicionar Profissional
+            </h3>
+
+            <form
+                onsubmit="app.addMember(event)"
+                class="space-y-4"
+            >
+
+                <div>
+
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Nome do Profissional
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nome"
+                        required
+                        placeholder="Ex: Dr. Roberto Silva"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">
+                        Especialidade/Cargo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="cargo"
+                        required
+                        placeholder="Ex: Nutricionista"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-100"
+                >
+                    Vincular à Equipe
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="app.closeModal()"
+                    class="w-full py-4 text-[10px] font-black uppercase tracking-widest text-slate-400"
+                >
+                    Voltar
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- INCIDENTE -->
+
+        <div
+            id="modal-reacao"
+            class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop"
+        >
+
+            <h3 class="text-2xl font-black text-red-600 mb-6 text-center">
+                Aviso de Emergência
+            </h3>
+
+            <form
+                onsubmit="app.sendIntercorrencia(event)"
+                class="space-y-4"
+            >
+
+                <select
+                    id="inc-tipo"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+                >
+                    <option>Queda</option>
+                    <option>Agitação Severa</option>
+                    <option>Recusa Alimentar</option>
+                    <option>Esquecimento Súbito</option>
+                </select>
+
+
+                <textarea
+                    id="inc-desc"
+                    rows="3"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm"
+                    placeholder="Descrição do evento..."
+                ></textarea>
+
+
+                <button
+                    type="submit"
+                    class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs"
+                >
+                    Enviar Notificação
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- NOTIFICAÇÃO -->
+
+    <div
+        id="toast"
+        class="hidden-el fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl flex items-center animate-pop"
+    >
+
+        <i class="fas fa-info-circle text-indigo-400 mr-3"></i>
+
+        <span
+            id="toast-text"
+            class="text-xs font-black uppercase tracking-widest"
+        >
+        </span>
+
+    </div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
