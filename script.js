@@ -1,3 +1,15 @@
+// ==============================
+// CONFIGURAÇÃO DO SUPABASE
+// ==============================
+
+const SUPABASE_URL = "https://hfvjtwhfzvnqdkhhmbyh.supabase.co/rest/v1/";
+
+const SUPABASE_ANON_KEY = "sb_publishable_iiz4_ldEhGT7EwwjE76gcA_Qy0NRmvu";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
 const app = {
     editarTarefa(id) {
@@ -694,83 +706,19 @@ if (listaMedicacoes) {
                 `${done}/${p.checklist.length} concluídos hoje`;
     },
     
-selectMood(type, icon, label) {
-
+    selectMood(type, icon, label) {
         const p = this.getActive();
 
-
-
         const now =
-
             new Date()
-
                 .toLocaleTimeString(
-
                     [],
-
                     {
-
                         hour: '2-digit',
-
                         minute: '2-digit'
-
                     }
-
                 );
 
-selectMood(type, icon, label) {
-
-        const p = this.getActive();
-
-
-
-        const now =
-
-            new Date()
-
-                .toLocaleTimeString(
-
-                    [],
-
-                    {
-
-                        hour: '2-digit',
-
-                        minute: '2-digit'
-
-                    }
-
-                );
-        }
-
-        p.mood = {
-            type,
-            icon,
-            label,
-            time: now
-        };
-
-        this.renderCuidadorUI();
-
-        this.showToast(
-            `Humor "${label}" gravado no banco!`
-        );
-    },
-
-        p.mood = {
-            type,
-            icon,
-            label,
-            time: now
-        };
-
-        this.renderCuidadorUI();
-
-        this.showToast(
-            `Humor "${label}" gravado no banco!`
-        );
-    },
-    },
         p.mood = {
             type,
             icon,
@@ -1739,4 +1687,3 @@ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
-
