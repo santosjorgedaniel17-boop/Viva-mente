@@ -731,6 +731,20 @@ async selectMood(type, icon, label) {
             `Humor "${label}" gravado no banco!`
         );
     },
+
+        p.mood = {
+            type,
+            icon,
+            label,
+            time: now
+        };
+
+        this.renderCuidadorUI();
+
+        this.showToast(
+            `Humor "${label}" gravado no banco!`
+        );
+    },
     },
         p.mood = {
             type,
