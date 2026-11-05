@@ -694,7 +694,7 @@ if (listaMedicacoes) {
                 `${done}/${p.checklist.length} concluídos hoje`;
     },
     
-   async selectMood(type, icon, label) {
+async selectMood(type, icon, label) {
         const p = this.getActive();
 
         const now = new Date().toLocaleTimeString([], {
@@ -706,7 +706,9 @@ if (listaMedicacoes) {
             .from('humor')
             .insert([
                 {
-                    nivel_humor: `${icon} ${label}`
+                    id_paciente: p ? p.id : 0,
+                    nivel_humor: `${icon} ${label}`,
+                    data_hora: new Date().toISOString()
                 }
             ]);
 
@@ -728,6 +730,7 @@ if (listaMedicacoes) {
         this.showToast(
             `Humor "${label}" gravado no banco!`
         );
+    },
     },
         p.mood = {
             type,
