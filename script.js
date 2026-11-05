@@ -694,19 +694,41 @@ if (listaMedicacoes) {
                 `${done}/${p.checklist.length} concluídos hoje`;
     },
     
-    selectMood(type, icon, label) {
+   async selectMood(type, icon, label) {
         const p = this.getActive();
 
-        const now =
-            new Date()
-                .toLocaleTimeString(
-                    [],
-                    {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }
-                );
+        const now = new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
+        const { data, error } = await supabaseClient
+            .from('humor')
+            .insert([
+                {
+                    nivel_humor: `${icon} ${label}`
+                }
+            ]);
+
+        if (error) {
+            console.error("Erro ao gravar humor no Supabase:", error);
+            this.showToast("Erro ao salvar no banco!");
+            return;
+        }
+
+        p.mood = {
+            type,
+            icon,
+            label,
+            time: now
+        };
+
+        this.renderCuidadorUI();
+
+        this.showToast(
+            `Humor "${label}" gravado no banco!`
+        );
+    },
         p.mood = {
             type,
             icon,
