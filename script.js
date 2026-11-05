@@ -694,28 +694,53 @@ if (listaMedicacoes) {
                 `${done}/${p.checklist.length} concluídos hoje`;
     },
     
-async selectMood(type, icon, label) {
+selectMood(type, icon, label) {
+
         const p = this.getActive();
 
-        const now = new Date().toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
 
-        const { data, error } = await supabaseClient
-            .from('humor')
-            .insert([
-                {
-                    id_paciente: p ? p.id : 0,
-                    nivel_humor: `${icon} ${label}`,
-                    data_hora: new Date().toISOString()
-                }
-            ]);
 
-        if (error) {
-            console.error("Erro ao gravar humor no Supabase:", error);
-            this.showToast("Erro ao salvar no banco!");
-            return;
+        const now =
+
+            new Date()
+
+                .toLocaleTimeString(
+
+                    [],
+
+                    {
+
+                        hour: '2-digit',
+
+                        minute: '2-digit'
+
+                    }
+
+                );
+
+selectMood(type, icon, label) {
+
+        const p = this.getActive();
+
+
+
+        const now =
+
+            new Date()
+
+                .toLocaleTimeString(
+
+                    [],
+
+                    {
+
+                        hour: '2-digit',
+
+                        minute: '2-digit'
+
+                    }
+
+                );
         }
 
         p.mood = {
